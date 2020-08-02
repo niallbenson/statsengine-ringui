@@ -1,0 +1,16 @@
+.header-container .header-router-link {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.header-container .header-router-link:hover {
+  text-decoration: underline;
+  color: #3b89ce;
+}
+
+.header-container #matches-dropdown {
+  height: 14px;
+  width: 14px;
+  display: inline-block;
+  margin-left: 8px;
+}

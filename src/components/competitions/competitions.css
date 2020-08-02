@@ -1,3 +1,14 @@
 .competitions {
-  /* TODO: add styles */
+   margin-left: 10px;
+   padding-top: 15px;
+}
+
+.competitions .flag-image {
+   width: 15px;
+   max-height: 10px;
+}
+
+.competitions .view-link {
+   text-decoration: none;
+   font-size: 0.9em;
 }

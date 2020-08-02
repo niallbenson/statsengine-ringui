@@ -1,22 +1,15 @@
-import React, {Component} from 'react';
-import Header, {
-  Logo,
-  Tray,
-  SmartProfile,
-  SmartServices,
-  TrayIcon,
-} from '@jetbrains/ring-ui/components/header/header';
-import Link from '@jetbrains/ring-ui/components/link/link';
-import settingsIcon from '@jetbrains/icons/settings-20px.svg';
-import searchIcon from '@jetbrains/icons/search-20px.svg';
+import React, { Component } from 'react';
 import Auth from '@jetbrains/ring-ui/components/auth/auth';
 import Footer from '@jetbrains/ring-ui/components/footer/footer';
-import spaceLogo from '@jetbrains/logos/space/space.svg';
 
 import Home from '../home/home';
 import Competitions from '../competitions/competitions';
 
 import './app.css';
+import HeaderContainer from '../header-container/header-container';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Competition from '../competition/competition';
+import Match from '../match/match';
 
 export default class AppRoot extends Component {
   componentDidMount() {
@@ -32,29 +25,19 @@ export default class AppRoot extends Component {
 
   render() {
     return (
-      <div>
-        <Header>
-          <a href="/">
-            <Logo
-              glyph={spaceLogo}
-              size={Logo.Size.Size48}
-            />
-          </a>
-          <Link active href="#">Fixtures</Link>
-          <Link href="#">Results</Link>
-          <Link href="#">Player stats</Link>
-          <Link href="#">Team stats</Link>
-          <Tray>
-            <TrayIcon title="Search" icon={searchIcon}/>
-            <TrayIcon title="Settings" icon={settingsIcon}/>
-            <SmartServices auth={this.auth}/>
-            <SmartProfile auth={this.auth}/>
-          </Tray>
-        </Header>
-        {/* <Home className="home" default="fixtures"/> */}
-        <Competitions className="comps" />
-        <Footer/>
-      </div>
+      <BrowserRouter>
+        <HeaderContainer className="header-container" auth={this.auth} />
+
+        <Switch>
+          <Route exact path = "/" component={Home} />
+          <Route path="/home" component={Home} />
+          <Route path="/competitions" render={() => <Competitions className="competitions" />} />
+          <Route path="/competition/:id" render={(props) => <Competition {...props} className="competition" />} />
+          <Route path="/match/:id" render={(props) => <Match {...props} matchId="" className="match" />} />
+        </Switch>
+
+        <Footer />
+      </BrowserRouter>
     );
   }
 }

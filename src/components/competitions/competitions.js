@@ -4,8 +4,11 @@ import classNames from 'classnames';
 
 import Table from '@jetbrains/ring-ui/components/table/table';
 import Selection from '@jetbrains/ring-ui/components/table/selection';
+import Button from '@jetbrains/ring-ui/components/button/button';
 
 import styles from './competitions.css';
+import { Link } from 'react-router-dom';
+import Heading from '@jetbrains/ring-ui/components/heading/heading';
 
 export default class Competitions extends PureComponent {
 
@@ -50,15 +53,25 @@ export default class Competitions extends PureComponent {
       sortable: false
     },
     {
-      id: 'gender',
-      title: 'Gender',
-      sortable: false
-    },
-    {
       id: 'country',
       title: 'Country',
+      sortable: true,
+      getValue: ({ country, countryFlag }) =>
+        <div>
+          <img className="flag-image" src={countryFlag} title={country}></img> {country}
+        </div>
+    },
+    {
+      id: 'gender',
+      title: 'Gender',
+      sortable: true,
+      getValue: ({ gender }) => gender === 'MALE' ? 'Men\'s' : 'Women\'s'
+    },
+    {
+      id: 'select',
+      title: '',
       sortable: false,
-      getValue: ({country}) => <strong>{country}</strong>
+      getValue: ({ id }) => <Link to={'/competition/' + id} className="view-link">View</Link>
     }
   ];
 
