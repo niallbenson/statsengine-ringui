@@ -2,7 +2,13 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import Text from '@jetbrains/ring-ui/components/text/text';
+import { Tab, SmartTabs } from '@jetbrains/ring-ui/components/tabs/tabs';
+import Heading, { H1, H2, H3, H4 } from '@jetbrains/ring-ui/components/heading/heading';
+
 import styles from './match.css';
+import { Link } from 'react-router-dom';
+import D3Pitch from '../d3-pitch/d3-pitch';
 
 export default class Match extends PureComponent {
   static propTypes = {
@@ -11,31 +17,63 @@ export default class Match extends PureComponent {
   };
 
   state = {
-    id: undefined,
-    match: undefined
+    matchId: undefined,
+    match: undefined,
+    homeGoals: undefined,
+    awayGoals: undefined
   }
 
   componentDidMount = () => {
     this.setState({
-      id: this.props.match.params.id
-    });
+      matchId: this.props.match.params.id
+    }, () => this.loadPage());
   }
 
   loadPage = () => {
+    fetch('http://localhost:8080/api/match/' + this.state.matchId)
+      .then(res => res.json())
+      .then(data => this.setState({ match: data }))
+      .catch(console.log);
+  }
 
+  getPlayerName(player) {
+    return player.nickName ? player.nickName : player.name;
   }
 
   render() {
     const { className, ...restProps } = this.props;
     const classes = classNames(styles.match, className);
 
-    if (!this.state.id) return (
-      <div>match not set</div>
-    );
+    const { match, homeGoals, awayGoals } = this.state;
+
+    if (!match) return (<div></div>);
+
+    const score = match.homeTeamName + ' ' + match.homeScore + ' - ' + match.awayScore + ' ' + match.awayTeamName;
+    const matchDate = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+      .format(new Date(match.matchDate))
 
     return (
       <div className={classes}>
-        <span>id = {this.state.id}</span>
+
+        <Link to={'/competition/' + match.competitionId} className="competition-link">{match.competitionName}</Link>
+        <H2 className="score-header">{score}</H2>
+        <Text info>{matchDate}</Text>
+        <div id="match-tabs">
+          <SmartTabs>
+            <Tab title="Visual">
+              <D3Pitch />
+            </Tab>
+
+            <Tab title="Line ups">
+              Line ups here...
+            </Tab>
+
+            <Tab title="Key events">
+              Key events here ...
+            </Tab>
+          </SmartTabs>
+        </div>
+
       </div>
     );
   }

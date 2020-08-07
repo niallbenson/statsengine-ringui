@@ -2,3 +2,15 @@
   margin-left: 30px;
   padding-top: 10px;
 }
+
+.match .competition-link {
+  text-decoration: none;
+}
+
+.match .score-header {
+  margin-top: 2px;
+}
+
+.match #match-tabs {
+  margin-top: 10px;
+}

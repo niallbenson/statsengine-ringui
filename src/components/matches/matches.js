@@ -87,7 +87,7 @@ export default class Matches extends PureComponent {
     if (redirect !== undefined) {
       const redirectUrl = '/match/' + redirect;
 
-      return <Redirect to={redirectUrl} />;
+      return <Redirect to={redirectUrl} push/>;
     }
 
     const { className, ...restProps } = this.props;

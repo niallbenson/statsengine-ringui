@@ -24,19 +24,23 @@ export default class Home extends PureComponent {
         </p>
         <p>
           StatsBomb are committed to sharing new data and research publicly to enhance understanding of the game of association football. They want to actively encourage new research
-          and analysis at all levels and therefore have made certain leagues of StatsBomb Data freely available for public use for research projects and genuine interest in football
-          analytics. StatsBomb are hoping that by making data freely available, they will extend the wider football analytics community and attract new talent to the industry.
+          and analysis at all levels and therefore have made certain leagues of StatsBomb data freely available for public use for research projects and genuine interest in football
+          analytics. StatsBomb are hoping that by making data freely available they will extend the wider football analytics community and attract new talent to the industry.
         </p>
         <p>
-          StatsEngine was created to try and support StatsBomb in this mission.
+        <strong>StatsEngine is an independent project</strong> developed to make use of this data. It allows you to analyse top flight women's football from England and USA, as well 
+          as all the data from 2018 World Cup, Arsenal's Invincibles season, every La Liga game Messi has played in and every Champions League final since 1999.
         </p>
         <p>
-          Using this site you will be able to analyse every La Liga game Lionel Messi has ever played in, along with every single event in the 2018 World Cup, every minute of every game 
-          played by Arsenal in their immortal invincibles season and every second of action in the FA Women's Super League since 2018.
+          Get started now by viewing <Link to="/competitions">competitions</Link>.
         </p>
-        <p>
-          Get started now by viewing <Link to="/competitions">competitions.</Link>
-        </p>
+        <div id="statsbomb-logo-container">
+          <span id="kindly-provided-by">All data used on this site kindly provided by</span>
+          <br />
+          <a href="https://statsbomb.com/" target="_blank">
+            <img src="src/assets/images/SB_Regular.png" id="statsbomb-logo" />
+          </a>
+        </div>
       </div>
     );
   }
