@@ -4,26 +4,25 @@ import ReactDOM from 'react-dom';
 import * as d3 from 'd3';
 
 export default class D3PitchLayout extends PureComponent {
-  grassColor = '#62B200';
-
-  height;
-  width;
+  state = {
+    height: undefined,
+    width: undefined,
+    grassColor: '#62B200'
+  };
 
   constructor(props) {
     super(props);
     this.ref = React.createRef();
-
-    this.height = props.height;
-    this.width = props.width;
-
-    console.log('hw', this.height, this.width);
   }
 
   componentDidMount() {
-    if (this.ref.current) {
+    this.setState({
+      height: this.props.height,
+      width: this.props.width
+    }, () => {
       this.drawPitchRect();
       this.drawPitchMarkings();
-    }
+    });
   }
 
   drawPitchRect() {
@@ -31,7 +30,7 @@ export default class D3PitchLayout extends PureComponent {
       .append('rect')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('fill', this.grassColor);
+      .attr('fill', this.state.grassColor);
   }
 
   drawPitchMarkings() {
@@ -109,11 +108,11 @@ export default class D3PitchLayout extends PureComponent {
   }
 
   x(pos) {
-    return this.width * pos;
+    return this.state.width * pos;
   }
 
   y(pos) {
-    return this.height * pos;
+    return this.state.height * pos;
   }
 
   drawPathWithWhiteLineNoFill(path) {
@@ -148,6 +147,8 @@ export default class D3PitchLayout extends PureComponent {
   }
 
   render() {
+    if (this.state.height === undefined || this.state.width === undefined) return <div></div>;
+
     return <g ref={this.ref} />;
   }
 }

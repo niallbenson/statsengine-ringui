@@ -50,7 +50,7 @@ export default class Match extends PureComponent {
 
     const score = match.homeTeamName + ' ' + match.homeScore + ' - ' + match.awayScore + ' ' + match.awayTeamName;
     const matchDate = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-      .format(new Date(match.matchDate))
+      .format(new Date(match.matchDate));
 
     return (
       <div className={classes}>
@@ -61,7 +61,7 @@ export default class Match extends PureComponent {
         <div id="match-tabs">
           <SmartTabs>
             <Tab title="Visual">
-              <D3Pitch />
+              <D3Pitch matchId={this.state.matchId} />
             </Tab>
 
             <Tab title="Line ups">

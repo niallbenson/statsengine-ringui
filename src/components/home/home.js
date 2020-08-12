@@ -18,9 +18,9 @@ export default class Home extends PureComponent {
 
     return (
       <div className="home">
-        <Heading level={Heading.Levels.H1}>StatsEngine</Heading>
+        <Heading level={Heading.Levels.H1}>theStatsEngine</Heading>
         <p>
-          StatsEngine is a data visualisation and analysis engine for the &nbsp;<a href="https://github.com/statsbomb/open-data" target="_blank">StatsBomb Open Data</a> repository.
+          <strong>theStatsEngine</strong> is a data visualisation and analysis engine for the <a href="https://github.com/statsbomb/open-data" target="_blank">StatsBomb Open Data</a> repository.
         </p>
         <p>
           StatsBomb are committed to sharing new data and research publicly to enhance understanding of the game of association football. They want to actively encourage new research
