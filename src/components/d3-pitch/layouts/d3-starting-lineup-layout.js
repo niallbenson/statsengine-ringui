@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { HomeAway } from '../enums/home-away';
 import getPitchAbsoluteXY from '../calcs/pitch-absolute-xy';
+import getPlayerDisplayName from '../calcs/player-display-name';
 
 import * as d3 from 'd3';
 
@@ -40,15 +41,15 @@ export default class D3StartingLineupLayout extends PureComponent {
       fetch('http://localhost:8080/api/tactics/match/' + this.state.match.id + '/team/' + this.state.match.homeTeamId),
       fetch('http://localhost:8080/api/tactics/match/' + this.state.match.id + '/team/' + this.state.match.awayTeamId)
     ])
-    .then(async([p1, p2]) => {
-      let homeTactics = await p1.json();
-      let awayTactics = await p2.json();
+      .then(async ([p1, p2]) => {
+        let homeTactics = await p1.json();
+        let awayTactics = await p2.json();
 
-      this.setState({
-        homeStartingLineup: homeTactics[0],
-        awayStartingLineup: awayTactics[0]
-      }, () => this.displayStartingLineups());
-    });
+        this.setState({
+          homeStartingLineup: homeTactics[0],
+          awayStartingLineup: awayTactics[0]
+        }, () => this.displayStartingLineups());
+      });
   }
 
   getPositionRelativeXY(position) {
@@ -150,7 +151,7 @@ export default class D3StartingLineupLayout extends PureComponent {
 
     this.addPlayerNodeClass(svgNode);
     this.addJerseyNumber(x, y, player.jerseyNumber);
-    
+    this.addPlayerName(x, y, player);
   }
 
   createPlayerNode(x, y, player, homeOrAway) {
@@ -175,12 +176,28 @@ export default class D3StartingLineupLayout extends PureComponent {
       .attr('x', x)
       .attr('y', y)
       .style('font-family', 'sans-serif')
-      .style('font-size', '10px')
+      .style('font-size', '9px')
       .style('text-anchor', 'middle')
       .style('dominant-baseline', 'central')
       .style('stroke', 'black')
       .style('pointer-events', 'none')
       .text(jerseyNumber ? jerseyNumber : '?');
+  }
+
+  addPlayerName(x, y, player) {
+    const playerName = getPlayerDisplayName(player);
+
+    d3.select(this.ref.current)
+      .append('text')
+      .attr('x', x)
+      .attr('y', y + 18)
+      .style('font-family', 'sans-serif')
+      .style('font-size', '9px')
+      .style('text-anchor', 'middle')
+      .style('dominant-baseline', 'central')
+      .style('stroke', '#212529')
+      .style('pointer-events', 'none')
+      .text(playerName);
   }
 
   getPlayerAbsoluteXy(player, homeOrAway) {
