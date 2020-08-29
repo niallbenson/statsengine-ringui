@@ -9,6 +9,7 @@ import Heading, { H1, H2, H3, H4 } from '@jetbrains/ring-ui/components/heading/h
 import styles from './match.css';
 import { Link } from 'react-router-dom';
 import D3Pitch from '../d3-pitch/d3-pitch';
+import MatchEvents from '../match-events/match-events';
 
 export default class Match extends PureComponent {
   static propTypes = {
@@ -60,16 +61,16 @@ export default class Match extends PureComponent {
         <Text info>{matchDate}</Text>
         <div id="match-tabs">
           <SmartTabs>
-            <Tab title="Visual">
+            <Tab title="Overview">
               <D3Pitch matchId={this.state.matchId} />
             </Tab>
 
-            <Tab title="Line ups">
-              Line ups here...
+            <Tab title="Events">
+              <MatchEvents matchId={this.state.matchId} />
             </Tab>
 
-            <Tab title="Key events">
-              Key events here ...
+            <Tab title="Line ups">
+              
             </Tab>
           </SmartTabs>
         </div>

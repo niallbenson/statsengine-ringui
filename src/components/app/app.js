@@ -5,6 +5,8 @@ import RedBox from 'redbox-react';
 import AppRoot from './app-root';
 import './app.css';
 
+import 'rsuite/dist/styles/rsuite-default.css';
+
 const appEl = document.querySelector('.app-root');
 const rootEl = document.createElement('div');
 

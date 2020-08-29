@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { HomeAway } from '../enums/home-away';
 import getPitchAbsoluteXY from '../calcs/pitch-absolute-xy';
-import getPlayerDisplayName from '../calcs/player-display-name';
+import getPlayerDisplayLastName from '../calcs/player-display-name';
 
 import * as d3 from 'd3';
 
@@ -185,14 +185,14 @@ export default class D3StartingLineupLayout extends PureComponent {
   }
 
   addPlayerName(x, y, player) {
-    const playerName = getPlayerDisplayName(player);
+    const playerName = getPlayerDisplayLastName(player);
 
     d3.select(this.ref.current)
       .append('text')
       .attr('x', x)
       .attr('y', y + 18)
       .style('font-family', 'sans-serif')
-      .style('font-size', '9px')
+      .style('font-size', '11px')
       .style('text-anchor', 'middle')
       .style('dominant-baseline', 'central')
       .style('stroke', '#212529')

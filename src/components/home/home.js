@@ -28,7 +28,7 @@ export default class Home extends PureComponent {
           analytics. StatsBomb are hoping that by making data freely available they will extend the wider football analytics community and attract new talent to the industry.
         </p>
         <p>
-        <strong>StatsEngine is an independent project</strong> developed to make use of this data. It allows you to analyse top flight women's football from England and USA, as well 
+        <strong>theStatsEngine is an independent project</strong> developed to make use of this data. It allows you to analyse top flight women's football from England and USA, as well 
           as all the data from 2018 World Cup, Arsenal's Invincibles season, every La Liga game Messi has played in and every Champions League final since 1999.
         </p>
         <p>
