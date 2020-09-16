@@ -10,7 +10,7 @@ import Dropdown from '@jetbrains/ring-ui/components/dropdown/dropdown';
 import settingsIcon from '@jetbrains/icons/settings-20px.svg';
 import searchIcon from '@jetbrains/icons/search-20px.svg';
 
-import spaceLogo from '@jetbrains/logos/space/space.svg';
+import Ball from 'react-svg-loader!../../assets/images/football2.svg';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -25,17 +25,14 @@ export default class HeaderContainer extends PureComponent {
   };
 
   render() {
-    const { className, auth } = this.props;
-    const classes = classNames(styles.headerContainer, className);
+    const { auth } = this.props;
+    const classes = classNames(styles.headerContainer, 'header-container');
 
     return (
       <div className={classes}>
         <Header>
           <a href="/">
-            <Logo
-              glyph={spaceLogo}
-              size={Logo.Size.Size48}
-            />
+            <Ball id="ball-logo"/>
           </a>
           <Link to="/competitions" className="header-router-link">Competitions</Link>
           <Link to="/home" className="header-router-link">Analyse</Link>

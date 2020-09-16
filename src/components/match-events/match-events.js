@@ -10,6 +10,7 @@ import { EventSignificance } from './enums/event-significance';
 import styles from './match-events.css';
 import EventSignificanceSlider from './ui-components/event-significance-slider';
 import Selection from '@jetbrains/ring-ui/components/table/selection';
+import LoadingScreen from '../loading-screen/loading-screen';
 
 export default class MatchEvents extends PureComponent {
   static propTypes = {
@@ -20,15 +21,16 @@ export default class MatchEvents extends PureComponent {
   state = {
     matchId: undefined,
     eventSignificance: undefined,
+    allData: undefined,
     data: undefined,
     selection: new Selection(),
     caption: undefined,
     selectable: false,
     draggable: false,
     page: 1,
-    pageSize: 20,
-    total: 7,
-    sortKey: 'name',
+    pageSize: 15,
+    total: undefined,
+    sortKey: 'index',
     sortOrder: true,
     loading: false
   }
@@ -41,28 +43,84 @@ export default class MatchEvents extends PureComponent {
     }, () => this.setEventSignificance(this.defautEventSignificance));
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { page, sortKey, sortOrder } = this.state;
+
+    if (
+      page !== prevState.page
+      || sortKey !== prevState.sortKey
+      || sortOrder !== prevState.sortOrder
+    ) {
+      this.setPage();
+    }
+  }
+
   setEventSignificance(value) {
     this.setState({ eventSignificance: value });
     this.loadData();
   }
 
+  onPageChange = page => {
+    this.setState({ page: page });
+  };
+
+  onSort = ({ column: { id: sortKey }, order: sortOrder }) => {
+    this.setState({ sortKey, sortOrder });
+  };
+
   loadData = () => {
     fetch(`http://localhost:8080/api/event/match/${this.state.matchId}/all`)
       .then(res => res.json())
-      .then(data => {
-        this.setState({ data: data }, () => this.loadPagedData());
-      })
+      .then(data => this.setState({ allData: data, total: data.length }, () => this.setPage()))
       .catch(console.log);
   }
 
-  loadPagedData = () => {
-    const { data, page, pageSize } = this.state;
+  setPage = () => {
+    const { allData, data, page, pageSize, sortKey, sortOrder } = this.state;
 
-    const updatedData = data.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
+    const sortedData = allData.sort((a, b) => {
+      const valueA = this.getValueForSortKey(a, sortKey);
+      const valueB = this.getValueForSortKey(b, sortKey);
 
-    const selection = new Selection({data});
+      if (valueA === null && valueB === null) return 0;
 
-    this.setState({data: updatedData, selection: selection});
+      if (valueA === null && valueB !== null) return sortOrder ? 1 : -1;
+
+      if (valueA !== null && valueB === null) return sortOrder ? -1 : 1;
+
+      return this.compareValuesForSort(valueA, valueB, sortKey) * (sortOrder ? 1 : -1);
+    });
+
+    const pageData = allData.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
+
+    const selection = new Selection({ data });
+
+    this.setState({ data: pageData, selection: selection });
+  }
+
+  getValueForSortKey(rowData, sortKey) {
+    if (sortKey === 'team') return rowData['eventTeam'].name;
+
+    if (sortKey === 'possessionTeam') return rowData['possessionTeam'].name;
+
+    if (sortKey === 'player' && rowData['player'] !== null) return rowData['player'].nickName ? rowData['player'].nickName : rowData['player'].name;
+
+    if (sortKey === 'time') return rowData['index']; // Better to return index here as it is chonological and ` will handle mutliple events within same second
+
+    return rowData[sortKey];
+  }
+
+  compareValuesForSort(valueA, valueB, sortKey) {
+    switch (sortKey) {
+      case 'distance':
+      case 'index':
+      case 'period':
+      case 'time':
+        return (valueA > valueB ? 1 : -1)
+
+      default:
+        return valueA.localeCompare(valueB);
+    }
   }
 
   columns = [
@@ -71,6 +129,16 @@ export default class MatchEvents extends PureComponent {
       title: 'Event Team',
       sortable: true,
       getValue: ({ eventTeam }) => eventTeam.name
+    },
+    {
+      id: 'eventType',
+      title: 'Event Type',
+      sortable: true
+    },
+    {
+      id: 'eventDetail',
+      title: 'Detail',
+      sortable: false
     },
     {
       id: 'playPattern',
@@ -88,6 +156,11 @@ export default class MatchEvents extends PureComponent {
       }
     },
     {
+      id: 'jerseyNumber',
+      title: 'Jersey No.',
+      sortable: false
+    },
+    {
       id: 'playerPosition',
       title: 'Position',
       sortable: true
@@ -99,11 +172,6 @@ export default class MatchEvents extends PureComponent {
       getValue: ({ possessionTeam }) => possessionTeam.name
     },
     {
-      id: 'eventType',
-      title: 'Event Type',
-      sortable: true
-    },
-    {
       id: 'outcome',
       title: 'Outcome',
       sortable: false
@@ -111,6 +179,12 @@ export default class MatchEvents extends PureComponent {
     {
       id: 'distance',
       title: 'Distance',
+      sortable: true,
+      getValue: ({ distance }) => distance || distance == '0' ? <div className="number-cell">{(Math.round(distance * 100) / 100).toFixed(2)}</div> : null
+    },
+    {
+      id: 'index',
+      title: 'Index',
       sortable: true
     },
     {
@@ -122,13 +196,9 @@ export default class MatchEvents extends PureComponent {
       id: 'time',
       title: 'Time',
       sortable: true,
-      getValue: ({ minute, second }) => minute + ':' + second
+      getValue: ({ minute, second }) => minute + ':' + ('0' + second).slice(-2)
     }
   ];
-
-  onSort = ({ column: { id: sortKey }, order: sortOrder }) => {
-    this.setState({ sortKey, sortOrder });
-  };
 
   getTable() {
     const {
@@ -147,7 +217,6 @@ export default class MatchEvents extends PureComponent {
 
     return (
       <div>
-        <hr />
         <Table
           data={data}
           columns={this.columns}
@@ -162,8 +231,10 @@ export default class MatchEvents extends PureComponent {
           selectable={selectable}
           isItemSelectable={this.isItemSelectable}
           draggable={draggable}
+          page={page}
+          pageSize={pageSize}
           autofocus />
-here
+
         <Pager
           total={total}
           pageSize={pageSize}
@@ -174,18 +245,17 @@ here
   }
 
   render() {
-    const { className } = this.props;
-
     const table = !this.state.data
-      ? <div></div>
+      ? <LoadingScreen />
       : this.getTable();
 
     return (
-      <div className={className}>
+      <div className="match-events">
         <EventSignificanceSlider
           startValue={this.defautEventSignificance}
           change={value => this.setEventSignificance(value)}
         />
+        <hr />
         {table}
       </div>
     );

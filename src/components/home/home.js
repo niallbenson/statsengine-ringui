@@ -35,7 +35,7 @@ export default class Home extends PureComponent {
           Get started now by viewing <Link to="/competitions">competitions</Link>.
         </p>
         <div id="statsbomb-logo-container">
-          <span id="kindly-provided-by">All data used on this site kindly provided by</span>
+          <span id="kindly-provided-by">All data used on this site made available by</span>
           <br />
           <a href="https://statsbomb.com/" target="_blank">
             <img src="src/assets/images/SB_Regular.png" id="statsbomb-logo" />

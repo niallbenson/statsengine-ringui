@@ -73,6 +73,7 @@
     "karma-teamcity-reporter": "^1.1.0",
     "karma-webpack": "^4.0.2",
     "mocha": "^8.1.1",
+    "react-svg-loader": "^3.0.3",
     "react-test-renderer": "^16.13.1",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",

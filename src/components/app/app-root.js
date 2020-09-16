@@ -26,7 +26,7 @@ export default class AppRoot extends Component {
   render() {
     return (
       <BrowserRouter>
-        <HeaderContainer className="header-container" auth={this.auth} />
+        <HeaderContainer auth={this.auth} />
 
         <Switch>
           <Route exact path = "/" component={Home} />
