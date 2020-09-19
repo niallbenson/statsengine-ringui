@@ -16,7 +16,8 @@ export default class D3Pitch extends PureComponent {
     displayType: undefined,
     svgHeight: 450,
     svgWidth: 700,
-    matchId: undefined
+    matchId: undefined,
+    selectedPlayerId: undefined
   };
 
   constructor(props) {
@@ -25,24 +26,43 @@ export default class D3Pitch extends PureComponent {
   }
 
   componentDidMount() {
-    this.setState({ 
-      displayType: DisplayType.STARTING_LINEUP,
+    this.setState({
+      displayType: this.props.displayType,
       matchId: this.props.matchId
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.displayType !== prevState.displayType
+      || this.props.selectedPlayerId !== prevState.selectedPlayerId) {
+
+      this.setState({
+        displayType: this.props.displayType,
+        selectedPlayerId: this.props.selectedPlayerId
+      });
+    }
+  }
+
   getDisplay() {
     if (this.state.displayType === DisplayType.STARTING_LINEUP) {
-      return <D3StartingLineupLayout height={this.state.svgHeight} width={this.state.svgWidth} matchId={this.state.matchId} />;
+      return <D3StartingLineupLayout
+        height={this.state.svgHeight}
+        width={this.state.svgWidth}
+        matchId={this.state.matchId}
+        playerClick={this.props.playerClick}
+      />;
     }
     else if (this.state.displayType === DisplayType.EVENT) {
       return <div>Event</div>;
+    }
+    else if (this.state.displayType === DisplayType.PLAYER_HEATMAP) {
+      return <div>Player heatmap to be displayed for {this.state.selectedPlayerId}</div>
     }
     return null;
   }
 
   render() {
-    if (this.state.displayType === undefined) return <div>not set</div>;
+    if (this.state.displayType === undefined) return <div></div>;
 
     const display = this.getDisplay(display);
 

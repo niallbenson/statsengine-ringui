@@ -52,6 +52,13 @@ export default class D3StartingLineupLayout extends PureComponent {
       });
   }
 
+  loadPlayerEvents = (player) => {
+    fetch(`http://localhost:8080/api/event/match/${this.state.match.id}/all/player/${player.playerId}`)
+      .then(res => res.json())
+      .then(data => console.log('Player events', data))
+      .catch(console.log);
+  }
+
   getPositionRelativeXY(position) {
     switch (position) {
       case 'Goalkeeper': {
@@ -152,6 +159,7 @@ export default class D3StartingLineupLayout extends PureComponent {
     this.addPlayerNodeClass(svgNode);
     this.addJerseyNumber(x, y, player.jerseyNumber);
     this.addPlayerName(x, y, player);
+    this.addPlayerClickEvent(svgNode, player);
   }
 
   createPlayerNode(x, y, player, homeOrAway) {
@@ -198,6 +206,10 @@ export default class D3StartingLineupLayout extends PureComponent {
       .style('stroke', '#212529')
       .style('pointer-events', 'none')
       .text(playerName);
+  }
+
+  addPlayerClickEvent(node, player) {
+    node.on('click', () => this.props.playerClick(player.playerId));
   }
 
   getPlayerAbsoluteXy(player, homeOrAway) {

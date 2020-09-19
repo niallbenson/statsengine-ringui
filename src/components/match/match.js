@@ -10,6 +10,7 @@ import styles from './match.css';
 import { Link } from 'react-router-dom';
 import D3Pitch from '../d3-pitch/d3-pitch';
 import MatchEvents from '../match-events/match-events';
+import MatchOverview from '../match-overview/match-overview';
 
 export default class Match extends PureComponent {
   static propTypes = {
@@ -62,7 +63,7 @@ export default class Match extends PureComponent {
         <div id="match-tabs">
           <SmartTabs>
             <Tab title="Overview">
-              <D3Pitch matchId={this.state.matchId} />
+              <MatchOverview matchId={this.state.matchId} />
             </Tab>
 
             <Tab title="Events">
