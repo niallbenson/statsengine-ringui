@@ -1,20 +1,22 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import Table from '@jetbrains/ring-ui/components/table/table';
 import Selection from '@jetbrains/ring-ui/components/table/selection';
-import Button from '@jetbrains/ring-ui/components/button/button';
 
+import {Link} from 'react-router-dom';
+
+// eslint-disable-next-line no-unused-vars
 import styles from './competitions.css';
-import { Link } from 'react-router-dom';
-import Heading from '@jetbrains/ring-ui/components/heading/heading';
+
+const className = 'competitions';
 
 export default class Competitions extends PureComponent {
 
   static propTypes = {
-    children: PropTypes.node,
-    className: PropTypes.string
+    page: PropTypes.number,
+    sortKey: PropTypes.number,
+    sortOrder: PropTypes.number
   };
 
   state = {
@@ -35,15 +37,12 @@ export default class Competitions extends PureComponent {
     this.loadPage();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { page, sortKey, sortOrder } = this.state;
-    if (
-      page !== prevState.page ||
-      sortKey !== prevState.sortKey ||
-      sortOrder !== prevState.sortOrder
-    ) {
-      this.loadPage();
-    }
+  loadPage = () => {
+    fetch('http://localhost:8080/api/competition').
+      then(res => res.json()).
+      then(data => this.setState({
+        data
+      }));
   }
 
   columns = [
@@ -56,43 +55,60 @@ export default class Competitions extends PureComponent {
       id: 'country',
       title: 'Country',
       sortable: true,
-      getValue: ({ country, countryFlag }) =>
-        <div>
-          <img className="flag-image" src={countryFlag} title={country}></img> {country}
-        </div>
+      getValue: ({country, countryFlag}) =>
+        this.getCountryValue(country, countryFlag)
     },
     {
       id: 'gender',
       title: 'Gender',
       sortable: true,
-      getValue: ({ gender }) => gender === 'MALE' ? 'Men\'s' : 'Women\'s'
+      getValue: ({gender}) => this.getGenderValue(gender)
     },
     {
       id: 'select',
       title: '',
       sortable: false,
-      getValue: ({ id }) => <Link to={'/competition/' + id} className="view-link">View</Link>
+      getValue: ({id}) => this.getLinkValue(id)
     }
   ];
 
-  onSort = ({ column: { id: sortKey }, order: sortOrder }) => {
-    this.setState({ sortKey, sortOrder });
-  };
-
-  loadPage = () => {
-    fetch('http://localhost:8080/api/competition')
-      .then(res => res.json())
-      .then(data => {
-        this.setState({ data: data });
-      })
-      .catch(console.log);
+  getCountryValue(country, countryFlag) {
+    return (
+      <div>
+        <img
+          alt={`Flag of ${country}`}
+          className="flag-image"
+          src={countryFlag}
+          title={country}
+        />
+        {country}
+      </div>
+    );
   }
 
-  render() {
-    if (!this.state.data) return (<div></div>);
+  getGenderValue(gender) {
+    return gender === 'MALE' ? 'Men\'s' : 'Women\'s';
+  }
 
-    const { children, className, ...restProps } = this.props;
-    const classes = classNames(styles.home, className);
+  getLinkValue(id) {
+    return (
+      <Link
+        to={`/competition/${id}`}
+        className="view-link"
+      >
+        {'View'}
+      </Link>
+    );
+  }
+
+  onSort = ({column: {id: sortKey}, order: sortOrder}) => {
+    this.setState({sortKey, sortOrder});
+  };
+
+  render() {
+    if (!this.state.data) {
+      return (<div/>);
+    }
 
     const {
       data,
@@ -100,22 +116,19 @@ export default class Competitions extends PureComponent {
       selectable,
       draggable,
       loading,
-      page,
-      pageSize,
-      total,
       selection,
       sortKey,
       sortOrder
     } = this.state;
 
     return (
-      <div className={classes}>
+      <div className={className}>
         <Table
           data={data}
           columns={this.columns}
           selection={selection}
-          onSelect={newSelection => this.setState({ selection: newSelection })}
-          onReorder={({ data: newData }) => this.setState({ data: newData })}
+          onSelect={newSelection => this.setState({selection: newSelection})}
+          onReorder={({data: newData}) => this.setState({data: newData})}
           loading={loading}
           onSort={this.onSort}
           sortKey={sortKey}
@@ -129,7 +142,6 @@ export default class Competitions extends PureComponent {
       </div>
     );
   }
-
 
 
 }

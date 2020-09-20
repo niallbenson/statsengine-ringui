@@ -1,26 +1,30 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import Table from '@jetbrains/ring-ui/components/table/table';
 import Pager from '@jetbrains/ring-ui/components/pager/pager';
 
-import { EventSignificance } from './enums/event-significance';
-
-import styles from './match-events.css';
-import EventSignificanceSlider from './ui-components/event-significance-slider';
 import Selection from '@jetbrains/ring-ui/components/table/selection';
+
 import LoadingScreen from '../loading-screen/loading-screen';
+
+import {EventSignificance} from './enums/event-significance';
+
+// eslint-disable-next-line no-unused-vars
+import styles from './match-events.css';
+
+import EventSignificanceSlider from './ui-components/event-significance-slider';
+
+const className = 'match-events';
 
 export default class MatchEvents extends PureComponent {
   static propTypes = {
-    children: PropTypes.node,
-    className: PropTypes.string
+    matchId: PropTypes.number.isRequired
   };
 
   state = {
     matchId: undefined,
-    eventSignificance: undefined,
+    eventSignificance: EventSignificance.ALL,
     allData: undefined,
     data: undefined,
     selection: new Selection(),
@@ -35,77 +39,102 @@ export default class MatchEvents extends PureComponent {
     loading: false
   }
 
-  defautEventSignificance = EventSignificance.ALL;
+  static getDerivedStateFromProps(nextProps) {
+    const {matchId} = nextProps;
+
+    return {matchId};
+  }
 
   componentDidMount() {
-    this.setState({
-      matchId: this.props.matchId
-    }, () => this.setEventSignificance(this.defautEventSignificance));
+    this.loadData();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { page, sortKey, sortOrder } = this.state;
+    const {page, sortKey, sortOrder} = this.state;
 
     if (
-      page !== prevState.page
-      || sortKey !== prevState.sortKey
-      || sortOrder !== prevState.sortOrder
+      page !== prevState.page ||
+      sortKey !== prevState.sortKey ||
+      sortOrder !== prevState.sortOrder
     ) {
       this.setPage();
     }
   }
 
   setEventSignificance(value) {
-    this.setState({ eventSignificance: value });
+    this.setState({eventSignificance: value});
     this.loadData();
   }
 
   onPageChange = page => {
-    this.setState({ page: page });
+    this.setState({page});
   };
 
-  onSort = ({ column: { id: sortKey }, order: sortOrder }) => {
-    this.setState({ sortKey, sortOrder });
+  onSort = ({column: {id: sortKey}, order: sortOrder}) => {
+    this.setState({sortKey, sortOrder});
   };
 
   loadData = () => {
-    fetch(`http://localhost:8080/api/event/match/${this.state.matchId}/all`)
-      .then(res => res.json())
-      .then(data => this.setState({ allData: data, total: data.length }, () => this.setPage()))
-      .catch(console.log);
+    fetch(`http://localhost:8080/api/event/match/${this.state.matchId}/all`).
+      then(res => res.json()).
+      then(data => this.setState({
+        allData: data,
+        total: data.length
+      }, () => this.setPage())).
+      catch(console.log);
   }
 
   setPage = () => {
-    const { allData, data, page, pageSize, sortKey, sortOrder } = this.state;
+    const {allData, data, page, pageSize, sortKey, sortOrder} = this.state;
 
-    const sortedData = allData.sort((a, b) => {
+    allData.sort((a, b) => {
       const valueA = this.getValueForSortKey(a, sortKey);
       const valueB = this.getValueForSortKey(b, sortKey);
 
-      if (valueA === null && valueB === null) return 0;
+      if (valueA === null && valueB === null) {
+        return 0;
+      }
 
-      if (valueA === null && valueB !== null) return sortOrder ? 1 : -1;
+      if (valueA === null && valueB !== null) {
+        return sortOrder ? 1 : -1;
+      }
 
-      if (valueA !== null && valueB === null) return sortOrder ? -1 : 1;
+      if (valueA !== null && valueB === null) {
+        return sortOrder ? -1 : 1;
+      }
 
-      return this.compareValuesForSort(valueA, valueB, sortKey) * (sortOrder ? 1 : -1);
+      return this.compareValuesForSort(valueA, valueB, sortKey) *
+        (sortOrder ? 1 : -1);
     });
 
-    const pageData = allData.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
+    const pageData = allData.slice((page - 1) * pageSize,
+      (page - 1) * pageSize + pageSize);
 
-    const selection = new Selection({ data });
+    const selection = new Selection({data});
 
-    this.setState({ data: pageData, selection: selection });
+    this.setState({data: pageData, selection});
   }
 
   getValueForSortKey(rowData, sortKey) {
-    if (sortKey === 'team') return rowData['eventTeam'].name;
+    const {eventTeam, possessionTeam, player, index} = rowData;
 
-    if (sortKey === 'possessionTeam') return rowData['possessionTeam'].name;
+    if (sortKey === 'team') {
+      return eventTeam.name;
+    }
 
-    if (sortKey === 'player' && rowData['player'] !== null) return rowData['player'].nickName ? rowData['player'].nickName : rowData['player'].name;
+    if (sortKey === 'possessionTeam') {
+      return possessionTeam.name;
+    }
 
-    if (sortKey === 'time') return rowData['index']; // Better to return index here as it is chonological and ` will handle mutliple events within same second
+    if (sortKey === 'player' && player !== null) {
+      const {nickName, name} = player;
+
+      return nickName ? nickName : name;
+    }
+
+    if (sortKey === 'time') {
+      return index;
+    } // Better to return index here as it is chronological and will handle multiple events within same second
 
     return rowData[sortKey];
   }
@@ -116,7 +145,7 @@ export default class MatchEvents extends PureComponent {
       case 'index':
       case 'period':
       case 'time':
-        return (valueA > valueB ? 1 : -1)
+        return (valueA > valueB ? 1 : -1);
 
       default:
         return valueA.localeCompare(valueB);
@@ -128,7 +157,7 @@ export default class MatchEvents extends PureComponent {
       id: 'team',
       title: 'Event Team',
       sortable: true,
-      getValue: ({ eventTeam }) => eventTeam.name
+      getValue: ({eventTeam}) => eventTeam.name
     },
     {
       id: 'eventType',
@@ -149,8 +178,10 @@ export default class MatchEvents extends PureComponent {
       id: 'player',
       title: 'Player',
       sortable: true,
-      getValue: ({ player }) => {
-        if (player) return player.nickName ? player.nickName : player.name;
+      getValue: ({player}) => {
+        if (player) {
+          return player.nickName ? player.nickName : player.name;
+        }
 
         return null;
       }
@@ -169,7 +200,7 @@ export default class MatchEvents extends PureComponent {
       id: 'possessionTeam',
       title: 'Possesssion Team',
       sortable: true,
-      getValue: ({ possessionTeam }) => possessionTeam.name
+      getValue: ({possessionTeam}) => possessionTeam.name
     },
     {
       id: 'outcome',
@@ -180,7 +211,8 @@ export default class MatchEvents extends PureComponent {
       id: 'distance',
       title: 'Distance',
       sortable: true,
-      getValue: ({ distance }) => distance || distance == '0' ? <div className="number-cell">{(Math.round(distance * 100) / 100).toFixed(2)}</div> : null
+      getValue: ({distance}) => (distance || distance === '0' ? <div
+        className="number-cell">{(Math.round(distance * 100) / 100).toFixed(2)}</div> : null)
     },
     {
       id: 'index',
@@ -196,7 +228,7 @@ export default class MatchEvents extends PureComponent {
       id: 'time',
       title: 'Time',
       sortable: true,
-      getValue: ({ minute, second }) => minute + ':' + ('0' + second).slice(-2)
+      getValue: ({minute, second}) => `${minute}:${(`0${second}`).slice(-2)}`
     }
   ];
 
@@ -221,8 +253,8 @@ export default class MatchEvents extends PureComponent {
           data={data}
           columns={this.columns}
           selection={selection}
-          onSelect={newSelection => this.setState({ selection: newSelection })}
-          onReorder={({ data: newData }) => this.setState({ data: newData })}
+          onSelect={newSelection => this.setState({selection: newSelection})}
+          onReorder={({data: newData}) => this.setState({data: newData})}
           loading={loading}
           onSort={this.onSort}
           sortKey={sortKey}
@@ -233,29 +265,32 @@ export default class MatchEvents extends PureComponent {
           draggable={draggable}
           page={page}
           pageSize={pageSize}
-          autofocus />
+          autofocus
+        />
 
         <Pager
           total={total}
           pageSize={pageSize}
           currentPage={page}
           disablePageSizeSelector
-          onPageChange={this.onPageChange} />
-      </div>);
+          onPageChange={this.onPageChange}
+        />
+      </div>
+    );
   }
 
   render() {
     const table = !this.state.data
-      ? <LoadingScreen />
+      ? <LoadingScreen/>
       : this.getTable();
 
     return (
-      <div className="match-events">
+      <div className={className}>
         <EventSignificanceSlider
-          startValue={this.defautEventSignificance}
+          startValue={this.state.eventSignificance}
           change={value => this.setEventSignificance(value)}
         />
-        <hr />
+        <hr/>
         {table}
       </div>
     );

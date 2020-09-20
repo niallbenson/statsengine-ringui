@@ -1,10 +1,13 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
+// eslint-disable-next-line import/no-unresolved
 import Ball from 'react-svg-loader!../../assets/images/football.svg';
 
+// eslint-disable-next-line no-unused-vars
 import styles from './loading-screen.css';
+
+const className = 'loadingScreen';
 
 export default class LoadingScreen extends PureComponent {
   static propTypes = {
@@ -13,13 +16,11 @@ export default class LoadingScreen extends PureComponent {
   };
 
   render() {
-    const classes = classNames(styles.loadingScreen, 'loadingScreen');
-
     return (
-      <div className={classes} id='stage'>
+      <div className={className} id="stage">
         <div id="traveler">
           <div id="bouncer">
-            <Ball className='ball' />
+            <Ball className="ball"/>
           </div>
         </div>
       </div>

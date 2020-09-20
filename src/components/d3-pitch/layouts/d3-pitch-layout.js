@@ -1,13 +1,14 @@
-import React, { PureComponent } from 'react';
-import ReactDOM from 'react-dom';
+import React, {PureComponent} from 'react';
+
+import PropTypes from 'prop-types';
 
 import * as d3 from 'd3';
 
 export default class D3PitchLayout extends PureComponent {
-  state = {
-    height: undefined,
-    width: undefined,
-    grassColor: '#62B200'
+
+  static propTypes = {
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired
   };
 
   constructor(props) {
@@ -15,29 +16,39 @@ export default class D3PitchLayout extends PureComponent {
     this.ref = React.createRef();
   }
 
+  state = {
+    height: undefined,
+    width: undefined,
+    grassColor: '#62B200'
+  };
+
+  static getDerivedStateFromProps(nextProps) {
+    const {height, width} = nextProps;
+
+    return {height, width};
+  }
+
   componentDidMount() {
-    this.setState({
-      height: this.props.height,
-      width: this.props.width
-    }, () => {
-      this.drawPitchRect();
-      this.drawPitchMarkings();
-    });
+    this.drawPitchRect();
+    this.drawPitchMarkings();
   }
 
   drawPitchRect() {
-    d3.select(this.ref.current)
-      .append('rect')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('fill', this.state.grassColor);
+    const {select} = d3;
+
+    select(this.ref.current).
+      append('rect').
+      attr('width', '100%').
+      attr('height', '100%').
+      attr('fill', this.state.grassColor);
   }
 
+  /* eslint-disable no-magic-numbers,max-len */
   drawPitchMarkings() {
     // Outside markings & half way line
     this.drawPathWithWhiteLineNoFill(
       `M ${this.x(0.5)},${this.y(0.02778)} L ${this.x(0.04348)},${this.y(0.02778)} ${this.x(0.04348)},${this.y(0.9722)} ${this.x(0.9566)},
-      ${this.y(0.9722)} ${this.x(0.9566)},${this.y(0.02778)} ${this.x(0.5)},${this.y(0.02778)} ${this.x(0.5)},${this.y(0.9722)} z`
+    ${this.y(0.9722)} ${this.x(0.9566)},${this.y(0.02778)} ${this.x(0.5)},${this.y(0.02778)} ${this.x(0.5)},${this.y(0.9722)} z`
     );
 
     // Box behind left hand goal
@@ -107,6 +118,8 @@ export default class D3PitchLayout extends PureComponent {
     this.drawCircleWithWhiteLineWhiteFill(this.x(0.8609), this.y(0.5), 2);
   }
 
+  /* eslint-enable no-magic-numbers, max-len */
+
   x(pos) {
     return this.state.width * pos;
   }
@@ -116,12 +129,14 @@ export default class D3PitchLayout extends PureComponent {
   }
 
   drawPathWithWhiteLineNoFill(path) {
-    return d3.select(this.ref.current)
-      .append('path')
-      .attr('d', path)
-      .attr('stroke', 'white')
-      .attr('stroke-width', '1.5')
-      .attr('fill-opacity', 0);
+    const {select} = d3;
+
+    return select(this.ref.current).
+      append('path').
+      attr('d', path).
+      attr('stroke', 'white').
+      attr('stroke-width', '1.5').
+      attr('fill-opacity', 0);
   }
 
   drawCircleWithWhiteLineNoFill(x, y, radius) {
@@ -137,18 +152,22 @@ export default class D3PitchLayout extends PureComponent {
   }
 
   drawCircleWithWhiteLine(x, y, radius) {
-    return d3.select(this.ref.current)
-      .append('circle')
-      .attr('cx', x)
-      .attr('cy', y)
-      .attr('r', radius)
-      .attr('stroke', 'white')
-      .attr('stroke-width', '1.5');
+    const {select} = d3;
+
+    return select(this.ref.current).
+      append('circle').
+      attr('cx', x).
+      attr('cy', y).
+      attr('r', radius).
+      attr('stroke', 'white').
+      attr('stroke-width', '1.5');
   }
 
   render() {
-    if (this.state.height === undefined || this.state.width === undefined) return <div></div>;
+    if (this.state.height === undefined || this.state.width === undefined) {
+      return <div/>;
+    }
 
-    return <g ref={this.ref} />;
+    return <g ref={this.ref}/>;
   }
 }

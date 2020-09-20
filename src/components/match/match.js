@@ -1,21 +1,23 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import Text from '@jetbrains/ring-ui/components/text/text';
-import { Tab, SmartTabs } from '@jetbrains/ring-ui/components/tabs/tabs';
-import Heading, { H1, H2, H3, H4 } from '@jetbrains/ring-ui/components/heading/heading';
+import {SmartTabs, Tab} from '@jetbrains/ring-ui/components/tabs/tabs';
+import {H2} from '@jetbrains/ring-ui/components/heading/heading';
 
-import styles from './match.css';
-import { Link } from 'react-router-dom';
-import D3Pitch from '../d3-pitch/d3-pitch';
+import {Link} from 'react-router-dom';
+
 import MatchEvents from '../match-events/match-events';
 import MatchOverview from '../match-overview/match-overview';
 
+// eslint-disable-next-line no-unused-vars
+import styles from './match.css';
+
+const className = 'match';
+
 export default class Match extends PureComponent {
   static propTypes = {
-    children: PropTypes.node,
-    className: PropTypes.string
+    match: PropTypes.object
   };
 
   state = {
@@ -25,54 +27,77 @@ export default class Match extends PureComponent {
     awayGoals: undefined
   }
 
+  static getDerivedStateFromProps(nextProps) {
+    const {id} = nextProps.match.params;
+
+    return {matchId: Number(id)};
+  }
+
   componentDidMount = () => {
-    this.setState({
-      matchId: this.props.match.params.id
-    }, () => this.loadPage());
+    this.loadPage();
   }
 
   loadPage = () => {
-    fetch('http://localhost:8080/api/match/' + this.state.matchId)
-      .then(res => res.json())
-      .then(data => this.setState({ match: data }))
-      .catch(console.log);
+    fetch(`http://localhost:8080/api/match/${this.state.matchId}`).
+      then(res => res.json()).
+      then(data => this.setState({match: data}));
   }
 
   getPlayerName(player) {
-    return player.nickName ? player.nickName : player.name;
+    const {nickName, name} = player;
+
+    return nickName ? nickName : name;
   }
 
   render() {
-    const { className, ...restProps } = this.props;
-    const classes = classNames(styles.match, className);
+    const {match} = this.state;
 
-    const { match, homeGoals, awayGoals } = this.state;
+    if (!match) {
+      return <div/>;
+    }
 
-    if (!match) return (<div></div>);
+    const {
+      homeTeamName, homeScore, awayTeamName, awayScore, matchDate,
+      competitionId, competitionName
+    } = match;
 
-    const score = match.homeTeamName + ' ' + match.homeScore + ' - ' + match.awayScore + ' ' + match.awayTeamName;
-    const matchDate = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-      .format(new Date(match.matchDate));
+    if (!match) {
+      return (<div/>);
+    }
+
+    const score = `${homeTeamName} ${homeScore} - ${awayScore} ${awayTeamName}`;
+    const formattedMatchDate = new Intl.DateTimeFormat('en', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    }).format(new Date(matchDate));
+
+    console.log(typeof this.state.matchId);
 
     return (
-      <div className={classes}>
+      <div className={className}>
 
-        <Link to={'/competition/' + match.competitionId} className="competition-link">{match.competitionName}</Link>
+        <Link
+          to={`/competition/${competitionId}`}
+          className="competition-link"
+        >
+          {competitionName}
+        </Link>
         <H2 className="score-header">{score}</H2>
-        <Text info>{matchDate}</Text>
+        <Text info>{formattedMatchDate}</Text>
         <div id="match-tabs">
           <SmartTabs>
             <Tab title="Overview">
-              <MatchOverview matchId={this.state.matchId} />
+              <MatchOverview matchId={this.state.matchId}/>
             </Tab>
 
             <Tab title="Events">
-              <MatchEvents matchId={this.state.matchId} />
+              <MatchEvents matchId={this.state.matchId}/>
             </Tab>
 
-            <Tab title="Line ups">
-              
-            </Tab>
+            <Tab title="Line ups"/>
           </SmartTabs>
         </div>
 
