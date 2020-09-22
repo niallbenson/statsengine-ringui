@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {DisplayType} from './enums/display-type';
 import D3PitchLayout from './layouts/d3-pitch-layout';
 import D3StartingLineupLayout from './layouts/d3-starting-lineup-layout';
+import D3HeatmapLayout from "./layouts/d3-heatmap-layout";
 
 export default class D3Pitch extends PureComponent {
 
@@ -41,39 +42,47 @@ export default class D3Pitch extends PureComponent {
   }
 
   getDisplay() {
+    const {svgHeight, svgWidth, displayType, selectedPlayerId} = this.state;
+    const {matchId, playerClick} = this.props;
+
     if (this.state.displayType === DisplayType.STARTING_LINEUP) {
       return (
         <D3StartingLineupLayout
-          height={this.state.svgHeight}
-          width={this.state.svgWidth}
-          matchId={this.props.matchId}
-          playerClick={this.props.playerClick}
+          height={svgHeight}
+          width={svgWidth}
+          matchId={matchId}
+          playerClick={playerClick}
         />
       );
-    } else if (this.state.displayType === DisplayType.EVENT) {
+    } else if (displayType === DisplayType.EVENT) {
       return <div>{'Event'}</div>;
-    } else if (this.state.displayType === DisplayType.PLAYER_HEATMAP) {
+    } else if (displayType === DisplayType.PLAYER_HEATMAP) {
       return (
-        <div>
-          {`Player heatmap to be displayed for ${this.state.selectedPlayerId}`}
-        </div>
+        <D3HeatmapLayout
+          height={svgHeight}
+          width={svgWidth}
+          matchId={matchId}
+          playerId={selectedPlayerId}
+        />
       );
     }
     return null;
   }
 
   render() {
-    if (this.state.displayType === undefined) {
+    const {svgHeight, svgWidth, displayType} = this.state;
+
+    if (displayType === undefined) {
       return <div/>;
     }
 
     const display = this.getDisplay();
 
     return (
-      <svg height={this.state.svgHeight} width={this.state.svgWidth}>
+      <svg height={svgHeight} width={svgWidth}>
         <D3PitchLayout
-          height={this.state.svgHeight}
-          width={this.state.svgWidth}
+          height={svgHeight}
+          width={svgWidth}
         />
         {display}
       </svg>

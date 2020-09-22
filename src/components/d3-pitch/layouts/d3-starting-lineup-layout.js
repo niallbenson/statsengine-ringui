@@ -8,7 +8,6 @@ import {HomeAway} from '../enums/home-away';
 import getPitchAbsoluteXY from '../calcs/pitch-absolute-xy';
 import getPlayerDisplayLastName from '../calcs/player-display-name';
 
-
 export default class D3StartingLineupLayout extends PureComponent {
 
   static propTypes = {
@@ -24,17 +23,9 @@ export default class D3StartingLineupLayout extends PureComponent {
   }
 
   state = {
-    height: undefined,
-    width: undefined,
     match: undefined,
     homeStartingLineup: undefined,
     awayStartingLineup: undefined
-  }
-
-  static getDerivedStateFromProps(nextProps) {
-    const {height, width} = nextProps;
-
-    return {height, width};
   }
 
   componentDidMount() {
@@ -218,8 +209,10 @@ export default class D3StartingLineupLayout extends PureComponent {
     const adjustedX = adjustedXy[0];
     const adjustedY = adjustedXy[1];
 
+    const {width, height} = this.props;
+
     return getPitchAbsoluteXY(
-      adjustedX, adjustedY, this.state.width, this.state.height);
+      adjustedX, adjustedY, width, height);
   }
 
   /* eslint-disable no-magic-numbers */
@@ -235,6 +228,7 @@ export default class D3StartingLineupLayout extends PureComponent {
 
     return null;
   }
+
   /* eslint-enable no-magic-numbers */
 
   render() {

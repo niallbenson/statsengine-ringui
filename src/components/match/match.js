@@ -74,8 +74,6 @@ export default class Match extends PureComponent {
       minute: '2-digit'
     }).format(new Date(matchDate));
 
-    console.log(typeof this.state.matchId);
-
     return (
       <div className={className}>
 
