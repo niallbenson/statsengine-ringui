@@ -26,22 +26,27 @@ export default class D3StartingLineupLayout extends PureComponent {
     match: undefined,
     homeStartingLineup: undefined,
     awayStartingLineup: undefined
-  }
+  };
 
   componentDidMount() {
     this.loadPage();
   }
 
   loadPage = () => {
-    fetch(`http://localhost:8080/api/match/${this.props.matchId}`).
+    const {matchId} = this.props;
+
+    fetch(`http://localhost:8080/api/match/${matchId}`).
       then(res => res.json()).
       then(data => this.setState({match: data}, () => this.loadLineups()));
-  }
+  };
 
   loadLineups = () => {
+    const {match} = this.state;
+    const {id, homeTeamId, awayTeamId} = match;
+
     Promise.all([
-      fetch(`http://localhost:8080/api/tactics/match/${this.state.match.id}/team/${this.state.match.homeTeamId}`),
-      fetch(`http://localhost:8080/api/tactics/match/${this.state.match.id}/team/${this.state.match.awayTeamId}`)
+      fetch(`http://localhost:8080/api/tactics/match/${id}/team/${homeTeamId}`),
+      fetch(`http://localhost:8080/api/tactics/match/${id}/team/${awayTeamId}`)
     ]).
       then(async ([p1, p2]) => {
         const homeTactics = await p1.json();
@@ -52,14 +57,14 @@ export default class D3StartingLineupLayout extends PureComponent {
           awayStartingLineup: awayTactics[0]
         }, () => this.displayStartingLineups());
       });
-  }
+  };
 
   loadPlayerEvents = player => {
     fetch(`http://localhost:8080/api/event/match/${this.state.match.id}/all/player/${player.playerId}`).
       then(res => res.json()).
       then(data => console.log('Player events', data)).
       catch(console.log);
-  }
+  };
 
   /* eslint-disable no-magic-numbers, complexity */
   getPositionRelativeXY(position) {
@@ -117,16 +122,16 @@ export default class D3StartingLineupLayout extends PureComponent {
       default:
         return null;
     }
-  }
-
-  /* eslint-enable no-magic-numbers, complexity */
+  } /* eslint-enable no-magic-numbers, complexity */
 
   displayStartingLineups() {
-    this.state.homeStartingLineup.players.forEach(p => {
+    const {homeStartingLineup, awayStartingLineup} = this.state;
+
+    homeStartingLineup.players.forEach(p => {
       this.displayPlayer(p, HomeAway.HOME);
     });
 
-    this.state.awayStartingLineup.players.forEach(p => {
+    awayStartingLineup.players.forEach(p => {
       this.displayPlayer(p, HomeAway.AWAY);
     });
   }
@@ -227,9 +232,7 @@ export default class D3StartingLineupLayout extends PureComponent {
     }
 
     return null;
-  }
-
-  /* eslint-enable no-magic-numbers */
+  } /* eslint-enable no-magic-numbers */
 
   render() {
     return <g ref={this.ref}/>;

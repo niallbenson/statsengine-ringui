@@ -22,10 +22,24 @@ export default class D3HeatmapLayout extends PureComponent {
   }
 
   state = {
-    gridSize: 1 // start grid size at 1m x 1m
+    gridSize: 1, // start grid size at 1m x 1m
+    data: undefined
   };
 
   componentDidMount() {
+    this.loadPage();
+  }
+
+  loadPage() {
+    const {matchId, playerId} = this.props;
+    const {gridSize} = this.state;
+
+    fetch(`http://localhost:8080/api/heatmap/match/${matchId}/player/${playerId}/grid/${gridSize}`).
+      then(res => res.json).
+      then(data => this.setState({data}, () => this.displayGrids()));
+  }
+
+  displayGrids() {
     const pitchHeightInM = 80.0;
     const pitchWidthInM = 120.0;
 
@@ -54,8 +68,10 @@ export default class D3HeatmapLayout extends PureComponent {
     const svg = select(this.ref.current);
 
     svg.selectAll().
-      data()
-
+      data();
   }
 
+  render() {
+    return <div />;
+  }
 }

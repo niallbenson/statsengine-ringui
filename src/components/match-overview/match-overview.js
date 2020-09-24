@@ -18,14 +18,14 @@ export default class MatchOverview extends PureComponent {
 
   state = {
     matchId: undefined,
-    d3DisplayType: undefined,
+    d3DisplayType: DisplayType.STARTING_LINEUP,
     selectedPlayerId: undefined
   };
 
   static getDerivedStateFromProps(nextProps) {
     const {matchId} = nextProps;
 
-    return {matchId, d3DisplayType: DisplayType.STARTING_LINEUP};
+    return {matchId};
   }
 
   playerClickEvent = id => {
@@ -33,19 +33,22 @@ export default class MatchOverview extends PureComponent {
       selectedPlayerId: id,
       d3DisplayType: DisplayType.PLAYER_HEATMAP
     });
-  }
+  };
 
   render() {
     if (this.state.matchId === undefined) {
       return <div/>;
     }
 
+    const {matchId, d3DisplayType, selectedPlayerId} = this.state;
+
     return (
       <div className={className}>
         <D3Pitch
-          matchId={this.state.matchId}
-          displayType={this.state.d3DisplayType}
+          matchId={matchId}
+          displayType={d3DisplayType}
           playerClick={this.playerClickEvent}
+          selectedPlayerId={selectedPlayerId}
         />
       </div>
     );
