@@ -35,43 +35,61 @@ export default class D3HeatmapLayout extends PureComponent {
     const {gridSize} = this.state;
 
     fetch(`http://localhost:8080/api/heatmap/match/${matchId}/player/${playerId}/grid/${gridSize}`).
-      then(res => res.json).
+      then(res => res.json()).
       then(data => this.setState({data}, () => this.displayGrids()));
   }
 
   displayGrids() {
+    const {gridSize, data} = this.state;
+    const {scaleBand, select, axisBottom, axisLeft, scaleLinear} = d3;
+    const {width, height} = this.props;
+
+    console.log('data', data);
+
     const pitchHeightInM = 80.0;
     const pitchWidthInM = 120.0;
 
-    const {gridSize} = this.state;
-
     const rowsCount = pitchHeightInM / gridSize;
-    const colsCount = pitchWidthInM / gridSize;
-
     const rows = Array.from({length: rowsCount}, Number.call, i => i + 1);
+
+    const colsCount = pitchWidthInM / gridSize;
     const cols = Array.from({length: colsCount}, Number.call, i => i + 1);
 
-    const {scaleBand, select} = d3;
-
-    const {width, height} = this.props;
+    const svg = select(this.ref.current);
 
     const x = scaleBand().
       range([0, width]).
       domain(cols).
-      padding(0.05);
+      padding(0.01);
+
+    svg.append('g').
+      attr('transform', `translate(0,${height})`).
+      call(axisBottom(x));
 
     const y = scaleBand().
       range([0, height]).
       domain(rows).
-      padding(0.05);
+      padding(0.01);
 
-    const svg = select(this.ref.current);
+    svg.append('g').
+      call(axisLeft(y));
+
+    const colorScale = scaleLinear().
+      range(['white', '#69b3a2']).
+      domain([1, 10]);
 
     svg.selectAll().
-      data();
+      data(data, d => d.x + ':' + d.y).
+      enter().
+      append('rect').
+      attr('x', d => x(d.x)).
+      attr('y', d => y(d.y)).
+      attr('width', x.bandwidth()).
+      attr('height', y.bandwidth()).
+      style('fill', d => colorScale(d.value));
   }
 
   render() {
-    return <div />;
+    return <div/>;
   }
 }
