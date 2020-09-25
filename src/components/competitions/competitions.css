@@ -6,6 +6,7 @@
 .competitions .flag-image {
   width: 15px;
   max-height: 10px;
+  padding-right: 3px;
 }
 
 .competitions .view-link {

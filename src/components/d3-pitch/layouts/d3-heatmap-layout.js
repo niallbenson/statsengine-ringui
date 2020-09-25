@@ -36,15 +36,13 @@ export default class D3HeatmapLayout extends PureComponent {
 
     fetch(`http://localhost:8080/api/heatmap/match/${matchId}/player/${playerId}/grid/${gridSize}`).
       then(res => res.json()).
-      then(data => this.setState({data}, () => this.displayGrids()));
+      then(data => this.setState({data}, () => this.displayGridCells()));
   }
 
-  displayGrids() {
+  displayGridCells() {
     const {gridSize, data} = this.state;
     const {scaleBand, select, axisBottom, axisLeft, scaleLinear} = d3;
     const {width, height} = this.props;
-
-    console.log('data', data);
 
     const pitchHeightInM = 80.0;
     const pitchWidthInM = 120.0;
@@ -76,10 +74,10 @@ export default class D3HeatmapLayout extends PureComponent {
 
     const colorScale = scaleLinear().
       range(['white', '#69b3a2']).
-      domain([1, 10]);
+      domain([1, 3]);
 
     svg.selectAll().
-      data(data, d => d.x + ':' + d.y).
+      data(data, d => `${d.x}:${d.y}`).
       enter().
       append('rect').
       attr('x', d => x(d.x)).
@@ -90,6 +88,6 @@ export default class D3HeatmapLayout extends PureComponent {
   }
 
   render() {
-    return <div/>;
+    return <g ref={this.ref}/>;
   }
 }
