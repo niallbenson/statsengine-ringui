@@ -22,7 +22,7 @@ export default class D3HeatmapLayout extends PureComponent {
   }
 
   state = {
-    gridSize: 1, // start grid size at 1m x 1m
+    gridSize: 5, // start grid size at 1m x 1m
     data: undefined
   };
 
@@ -48,10 +48,10 @@ export default class D3HeatmapLayout extends PureComponent {
     const pitchWidthInM = 120.0;
 
     const rowsCount = pitchHeightInM / gridSize;
-    const rows = Array.from({length: rowsCount}, Number.call, i => i + 1);
+    const rows = Array.from({length: rowsCount}, Number.call, i => i * gridSize);
 
     const colsCount = pitchWidthInM / gridSize;
-    const cols = Array.from({length: colsCount}, Number.call, i => i + 1);
+    const cols = Array.from({length: colsCount}, Number.call, i => i * gridSize);
 
     const svg = select(this.ref.current);
 
@@ -60,21 +60,16 @@ export default class D3HeatmapLayout extends PureComponent {
       domain(cols).
       padding(0.01);
 
-    svg.append('g').
-      attr('transform', `translate(0,${height})`).
-      call(axisBottom(x));
-
     const y = scaleBand().
       range([0, height]).
       domain(rows).
       padding(0.01);
 
-    svg.append('g').
-      call(axisLeft(y));
+    const maxValue = Math.max(...data.map(i => i.value));
 
     const colorScale = scaleLinear().
-      range(['white', '#69b3a2']).
-      domain([1, 3]);
+      range(['yellow', 'red']).
+      domain([1, maxValue]);
 
     svg.selectAll().
       data(data, d => `${d.x}:${d.y}`).
