@@ -6,6 +6,7 @@ import {DisplayType} from './enums/display-type';
 import D3PitchLayout from './layouts/d3-pitch-layout';
 import D3StartingLineupLayout from './layouts/d3-starting-lineup-layout';
 import D3HeatmapLayout from './layouts/d3-heatmap-layout';
+import HeatmapSettings from '../heatmap-settings/heatmap-settings';
 
 export default class D3Pitch extends PureComponent {
 

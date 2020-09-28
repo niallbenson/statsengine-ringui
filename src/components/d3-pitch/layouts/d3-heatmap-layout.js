@@ -22,7 +22,7 @@ export default class D3HeatmapLayout extends PureComponent {
   }
 
   state = {
-    gridSize: 5, // start grid size at 1m x 1m
+    gridSize: 10, // start grid size at 1m x 1m
     data: undefined
   };
 
@@ -41,17 +41,19 @@ export default class D3HeatmapLayout extends PureComponent {
 
   displayGridCells() {
     const {gridSize, data} = this.state;
-    const {scaleBand, select, axisBottom, axisLeft, scaleLinear} = d3;
+    const {scaleBand, select, scaleLinear} = d3;
     const {width, height} = this.props;
 
     const pitchHeightInM = 80.0;
     const pitchWidthInM = 120.0;
 
     const rowsCount = pitchHeightInM / gridSize;
-    const rows = Array.from({length: rowsCount}, Number.call, i => i * gridSize);
+    const rows = Array.from(
+      {length: rowsCount}, Number.call, i => i * gridSize);
 
     const colsCount = pitchWidthInM / gridSize;
-    const cols = Array.from({length: colsCount}, Number.call, i => i * gridSize);
+    const cols = Array.from(
+      {length: colsCount}, Number.call, i => i * gridSize);
 
     const svg = select(this.ref.current);
 
@@ -71,6 +73,8 @@ export default class D3HeatmapLayout extends PureComponent {
       range(['yellow', 'red']).
       domain([1, maxValue]);
 
+    const gridOpacity = 0.7;
+
     svg.selectAll().
       data(data, d => `${d.x}:${d.y}`).
       enter().
@@ -79,6 +83,7 @@ export default class D3HeatmapLayout extends PureComponent {
       attr('y', d => y(d.y)).
       attr('width', x.bandwidth()).
       attr('height', y.bandwidth()).
+      attr('opacity', gridOpacity).
       style('fill', d => colorScale(d.value));
   }
 
