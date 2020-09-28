@@ -37,8 +37,15 @@ export default class MatchOverview extends PureComponent {
     });
   };
 
+  clearHeatmap = () => {
+    this.setState({
+      selectedPlayerId: undefined,
+      d3DisplayType: DisplayType.STARTING_LINEUP
+    });
+  }
+
   getHeatmapSettings() {
-    const {selectedPlayerId, d3DisplayType} = this.state;
+    const {matchId, selectedPlayerId, d3DisplayType} = this.state;
 
     if (d3DisplayType !== DisplayType.PLAYER_HEATMAP || !selectedPlayerId) {
       return null;
@@ -46,7 +53,9 @@ export default class MatchOverview extends PureComponent {
 
     return (
       <HeatmapSettings
-
+        matchId={matchId}
+        playerId={selectedPlayerId}
+        clearHeatmap={this.clearHeatmap}
       />
     );
   }
