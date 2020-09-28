@@ -1,3 +1,9 @@
-.heatmapSettings {
-  /* TODO: add styles */
+.heatmap-settings #slider-container {
+  margin-top: 8px;
+  margin-left: 10px;
+}
+
+.heatmap-settings #slider {
+  margin-top: 10px;
+  margin-left: 5px;
 }

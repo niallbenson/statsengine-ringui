@@ -13,7 +13,8 @@ export default class D3HeatmapLayout extends PureComponent {
     matchId: PropType.number.isRequired,
     playerId: PropType.number.isRequired,
     height: PropType.number.isRequired,
-    width: PropType.number.isRequired
+    width: PropType.number.isRequired,
+    gridSize: PropType.number.isRequired
   };
 
   constructor(props) {
@@ -22,12 +23,32 @@ export default class D3HeatmapLayout extends PureComponent {
   }
 
   state = {
-    gridSize: 10, // start grid size at 1m x 1m
+    gridSize: undefined, // start grid size at 1m x 1m
     data: undefined
   };
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const {gridSize} = nextProps;
+
+    if (gridSize !== prevState.gridSize) {
+      return {gridSize};
+    }
+
+    return null;
+  }
+
   componentDidMount() {
     this.loadPage();
+  }
+
+  componentDidUpdate(prevProps) {
+    const {gridSize} = this.state;
+
+    if (prevProps.gridSize !== gridSize) {
+      this.clearGridTiles();
+
+      this.loadPage();
+    }
   }
 
   loadPage() {
@@ -37,6 +58,13 @@ export default class D3HeatmapLayout extends PureComponent {
     fetch(`http://localhost:8080/api/heatmap/match/${matchId}/player/${playerId}/grid/${gridSize}`).
       then(res => res.json()).
       then(data => this.setState({data}, () => this.displayGridCells()));
+  }
+
+  clearGridTiles() {
+    const {select} = d3;
+    const svg = select(this.ref.current);
+
+    svg.selectAll('g > *').remove();
   }
 
   displayGridCells() {
