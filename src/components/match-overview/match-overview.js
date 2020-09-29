@@ -22,7 +22,9 @@ export default class MatchOverview extends PureComponent {
     matchId: undefined,
     d3DisplayType: DisplayType.STARTING_LINEUP,
     selectedPlayerId: undefined,
-    gridSize: 5
+    gridSize: 5,
+    svgHeight: 450,
+    svgWidth: 700,
   };
 
   static getDerivedStateFromProps(nextProps) {
@@ -50,7 +52,9 @@ export default class MatchOverview extends PureComponent {
   };
 
   getHeatmapSettings() {
-    const {matchId, selectedPlayerId, d3DisplayType, gridSize} = this.state;
+    const {
+      matchId, selectedPlayerId, d3DisplayType, gridSize, svgWidth
+    } = this.state;
 
     if (d3DisplayType !== DisplayType.PLAYER_HEATMAP || !selectedPlayerId) {
       return null;
@@ -63,6 +67,7 @@ export default class MatchOverview extends PureComponent {
         clearHeatmap={this.clearHeatmap}
         gridSize={gridSize}
         onGridSizeChange={this.onGridSizeChange}
+        heatmapWidth={svgWidth}
       />
     );
   }
@@ -72,7 +77,9 @@ export default class MatchOverview extends PureComponent {
       return <div/>;
     }
 
-    const {matchId, d3DisplayType, selectedPlayerId, gridSize} = this.state;
+    const {
+      matchId, d3DisplayType, selectedPlayerId, gridSize, svgHeight, svgWidth
+    } = this.state;
 
     return (
       <div className={className}>
@@ -82,6 +89,8 @@ export default class MatchOverview extends PureComponent {
           playerClick={this.playerClickEvent}
           selectedPlayerId={selectedPlayerId}
           gridSize={gridSize}
+          svgWidth={svgWidth}
+          svgHeight={svgHeight}
         />
         {this.getHeatmapSettings()}
       </div>

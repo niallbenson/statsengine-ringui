@@ -17,7 +17,8 @@ export default class HeatmapSettings extends PureComponent {
     matchId: PropTypes.number.isRequired,
     clearHeatmap: PropTypes.func.isRequired,
     gridSize: PropTypes.number.isRequired,
-    onGridSizeChange: PropTypes.func.isRequired
+    onGridSizeChange: PropTypes.func.isRequired,
+    heatmapWidth: PropTypes.number.isRequired
   };
 
   state = {
@@ -52,18 +53,16 @@ export default class HeatmapSettings extends PureComponent {
 
   render() {
     const {player} = this.state;
-    const {clearHeatmap, onGridSizeChange, gridSize} = this.props;
+    const {clearHeatmap, onGridSizeChange, gridSize, heatmapWidth} = this.props;
 
     if (!player) {
       return <div/>;
     }
 
     return (
-      <div className={className}>
+      <div className={className} style={{width: heatmapWidth}}>
         <Button icon={closeIcon} primary onClick={clearHeatmap}/>
-        {player.name}
-        <div id={'slider-container'}>
-          {'Grid size'}
+        <div id={'slider-container'} style={{float: 'right'}}>
           <Slider
             id={'slider'}
             defaultValue={this.gridSizes.indexOf(gridSize)}
@@ -74,6 +73,7 @@ export default class HeatmapSettings extends PureComponent {
             style={{width: 200}}
           />
         </div>
+        {player.name}
       </div>
     );
   }

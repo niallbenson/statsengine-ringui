@@ -14,7 +14,9 @@ export default class D3Pitch extends PureComponent {
     matchId: PropTypes.number.isRequired,
     selectedPlayerId: PropTypes.number,
     playerClick: PropTypes.func.isRequired,
-    gridSize: PropTypes.number.isRequired
+    gridSize: PropTypes.number.isRequired,
+    svgHeight: PropTypes.number.isRequired,
+    svgWidth: PropTypes.number.isRequired
   };
 
   constructor(props) {
@@ -24,8 +26,6 @@ export default class D3Pitch extends PureComponent {
 
   state = {
     displayType: undefined,
-    svgHeight: 450,
-    svgWidth: 700,
     matchId: undefined,
     selectedPlayerId: undefined,
     gridSize: undefined
@@ -45,10 +45,8 @@ export default class D3Pitch extends PureComponent {
   }
 
   getDisplay() {
-    const {
-      svgHeight, svgWidth, displayType, selectedPlayerId, gridSize
-    } = this.state;
-    const {matchId, playerClick} = this.props;
+    const {displayType, selectedPlayerId, gridSize} = this.state;
+    const {matchId, playerClick, svgHeight, svgWidth} = this.props;
 
     if (this.state.displayType === DisplayType.STARTING_LINEUP) {
       return (
@@ -76,7 +74,8 @@ export default class D3Pitch extends PureComponent {
   }
 
   render() {
-    const {svgHeight, svgWidth, displayType} = this.state;
+    const {displayType} = this.state;
+    const {svgHeight, svgWidth} = this.props;
 
     if (displayType === undefined) {
       return <div/>;
